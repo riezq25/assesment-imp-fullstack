@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\Auth\LoginController;
 use App\Http\Controllers\Api\V1\Auth\LogoutController;
 use App\Http\Controllers\Api\V1\Auth\ProfileController;
 use App\Http\Controllers\Api\V1\Auth\RegisterController;
+use App\Http\Controllers\Api\V1\Blog\BlogController;
 use App\Http\Controllers\Api\V1\Blog\CategoryController;
 use Illuminate\Support\Facades\Route;
 
@@ -35,5 +36,10 @@ Route::group([
                     'index',
                     'show'
                 ]);
+
+            Route::apiResource(
+                'blogs',
+                BlogController::class
+            );
         });
 });

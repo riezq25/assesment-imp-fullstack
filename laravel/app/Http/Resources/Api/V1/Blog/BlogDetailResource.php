@@ -7,7 +7,7 @@ use App\Http\Resources\Api\V1\Blog\Category\CategoryResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class BlogResource extends JsonResource
+class BlogDetailResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -18,9 +18,9 @@ class BlogResource extends JsonResource
     {
         return [
             'id'        => $this->id,
-            'slug'      => $this->slug,
             'title'     => $this->title,
             'featured_image' => $this->featured_image_url,
+            'content' => $this->content,
             'category_id' => $this->category_id,
             'category' => new CategoryResource($this->category),
             'created_at'  => $this->created_at,
