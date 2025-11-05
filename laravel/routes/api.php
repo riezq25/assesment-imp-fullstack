@@ -26,20 +26,35 @@ Route::group([
             });
     });
 
+    Route::apiResource(
+        'blog-categories',
+        CategoryController::class
+    )
+        ->only([
+            'index',
+            'show',
+        ]);
+
+    Route::apiResource(
+        'blogs',
+        BlogController::class
+    )
+        ->only([
+            'index',
+            'show'
+        ]);
+
     Route::middleware('auth:sanctum')
         ->group(function () {
-            Route::apiResource(
-                'blog-categories',
-                CategoryController::class
-            )
-                ->only([
-                    'index',
-                    'show',
-                ]);
 
             Route::apiResource(
                 'blogs',
                 BlogController::class
-            );
+            )
+                ->only([
+                    'store',
+                    'update',
+                    'destroy'
+                ]);
         });
 });
