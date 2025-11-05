@@ -29,7 +29,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             CategorySeeder::class,
         ]);
-        
+
         // Then seed blogs that depend on categories
         $this->call([
             BlogSeeder::class,

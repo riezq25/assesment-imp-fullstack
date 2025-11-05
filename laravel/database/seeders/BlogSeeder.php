@@ -6,7 +6,6 @@ use App\Models\Blog;
 use App\Models\Category;
 use App\Models\User;
 use Faker\Factory as Faker;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -23,7 +22,7 @@ class BlogSeeder extends Seeder
         $user = User::first();
 
         // Ensure the blogs directory exists in storage
-        if (!Storage::exists(Blog::FEATURED_IMAGE_PATH)) {
+        if (! Storage::exists(Blog::FEATURED_IMAGE_PATH)) {
             Storage::makeDirectory(Blog::FEATURED_IMAGE_PATH);
         }
 
@@ -31,15 +30,15 @@ class BlogSeeder extends Seeder
         $storagePath = null;
         $placeholderPath = public_path('images/placeholder.png');
         if (file_exists($placeholderPath)) {
-            $storagePath = Blog::FEATURED_IMAGE_PATH . '/placeholder.png';
-            if (!Storage::exists($storagePath)) {
+            $storagePath = Blog::FEATURED_IMAGE_PATH.'/placeholder.png';
+            if (! Storage::exists($storagePath)) {
                 Storage::put($storagePath, file_get_contents($placeholderPath));
             }
         }
 
         for ($i = 0; $i < 20; $i++) {
             $title = $faker->sentence();
-            $slug = Str::slug($title) . '-' . uniqid();
+            $slug = Str::slug($title).'-'.uniqid();
 
             Blog::create([
                 'title' => $title,

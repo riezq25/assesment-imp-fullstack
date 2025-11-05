@@ -13,7 +13,7 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable, HasUuids;
+    use HasApiTokens, HasFactory, HasUuids, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -25,7 +25,6 @@ class User extends Authenticatable
         'email',
         'password',
     ];
-    
 
     /**
      * The attributes that should be hidden for serialization.
@@ -59,6 +58,6 @@ class User extends Authenticatable
 
     public function getAvatarUrl(): string
     {
-        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&size=64';
+        return 'https://ui-avatars.com/api/?name='.urlencode($this->name).'&size=64';
     }
 }

@@ -10,6 +10,7 @@ class ProfileResource extends JsonResource
     public function toArray(Request $request): array
     {
         $user = $this->resource;
+
         return $user->only('id', 'name', 'email', 'avatar');
     }
 }

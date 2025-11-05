@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api\V1\Blog;
 
 use App\Http\Controllers\Api\V1\ApiBaseController;
-use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\Blog\Category\CategoryCollection;
 use App\Http\Resources\Api\V1\Blog\Category\CategoryResource;
 use App\Models\Category;

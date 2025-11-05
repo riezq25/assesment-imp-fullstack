@@ -27,7 +27,7 @@ class BlogUpdateRequest extends FormRequest
     {
         if ($this->slug) {
             $this->merge(['slug' => strtolower($this->slug)]);
-        } else if ($this->title) {
+        } elseif ($this->title) {
             $this->merge(['slug' => str()->slug($this->title)]);
         }
     }
@@ -54,7 +54,7 @@ class BlogUpdateRequest extends FormRequest
                 'nullable',
                 'string',
                 'max:255',
-                'unique:blogs,slug,' . $blogId
+                'unique:blogs,slug,'.$blogId,
             ],
             'content' => 'required|string',
             'category_id' => 'required|exists:categories,id',

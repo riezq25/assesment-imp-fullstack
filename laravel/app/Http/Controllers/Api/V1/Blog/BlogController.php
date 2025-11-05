@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\V1\Blog;
 
 use App\Helpers\FileHelper;
 use App\Http\Controllers\Api\V1\ApiBaseController;
-use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Blog\BlogStoreRequest;
 use App\Http\Requests\Api\V1\Blog\BlogUpdateRequest;
 use App\Http\Resources\Api\V1\Blog\BlogCollection;
@@ -12,7 +11,6 @@ use App\Http\Resources\Api\V1\Blog\BlogDetailResource;
 use App\Http\Resources\Api\V1\Blog\BlogResource;
 use App\Models\Blog;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class BlogController extends ApiBaseController
 {

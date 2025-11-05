@@ -69,6 +69,7 @@ class FileHelper
             if ($driver === 'public') {
                 return Storage::url($file);
             }
+
             return null;
         } catch (\Exception $e) {
             return null;

@@ -16,12 +16,12 @@ class LoginRequest extends FormRequest
         return [
             'email' => [
                 'required',
-                'email'
+                'email',
             ],
             'password' => [
                 'required',
-                'min:5'
-            ]
+                'min:5',
+            ],
         ];
     }
 }

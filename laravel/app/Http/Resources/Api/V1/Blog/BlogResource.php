@@ -17,18 +17,18 @@ class BlogResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'        => $this->id,
-            'slug'      => $this->slug,
-            'title'     => $this->title,
+            'id' => $this->id,
+            'slug' => $this->slug,
+            'title' => $this->title,
             'featured_image' => $this->featured_image_url,
             'category_id' => $this->category_id,
             'category' => new CategoryResource($this->category),
-            'created_at'  => $this->created_at,
-            'updated_at'  => $this->updated_at,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
             'created_by' => $this->created_by,
             'updated_by' => $this->updated_by,
-            'creator'   => new ProfileResource($this->creator),
-            'editor'   => new ProfileResource($this->editor),
+            'creator' => new ProfileResource($this->creator),
+            'editor' => new ProfileResource($this->editor),
         ];
     }
 }
