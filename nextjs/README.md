@@ -1,36 +1,194 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BlogApp - Simple Blog Post Application
 
-## Getting Started
+A modern blog application built with **Next.js 16**, **App Router**, **DaisyUI**, and **Laravel Sanctum** authentication.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+### Authentication
+- ✅ User Login
+- ✅ User Registration
+- ✅ User Profile
+- ✅ User Logout
+- ✅ Protected Routes
+
+### Blog Management
+- ✅ List all blog posts with pagination
+- ✅ View blog post details
+- ✅ Create new blog posts
+- ✅ Update existing blog posts
+- ✅ Delete blog posts
+- ✅ Category filtering
+
+### Category Management
+- ✅ List all categories
+- ✅ View category details
+- ✅ View posts by category
+
+## Tech Stack
+
+- **Framework**: Next.js 16 with App Router
+- **UI Library**: DaisyUI (Tailwind CSS)
+- **HTTP Client**: Axios
+- **Authentication**: Laravel Sanctum (Bearer Token)
+- **Language**: TypeScript
+
+## Prerequisites
+
+- Node.js 18+ or npm
+- Laravel backend API running with Sanctum authentication
+
+## Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd nextjs
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Configure environment variables**
+   
+   Create a `.env.local` file in the root directory:
+   ```env
+   NEXT_PUBLIC_API_URL=http://localhost:8000/api
+   ```
+   
+   Replace `http://localhost:8000/api` with your Laravel API URL.
+
+4. **Run the development server**
+   ```bash
+   npm run dev
+   ```
+
+5. **Open your browser**
+   
+   Navigate to [http://localhost:3000](http://localhost:3000)
+
+## Project Structure
+
+```
+src/
+├── app/                      # Next.js App Router pages
+│   ├── auth/                 # Authentication pages
+│   │   ├── login/           # Login page
+│   │   ├── register/        # Registration page
+│   │   └── profile/         # User profile page
+│   ├── blogs/               # Blog pages
+│   │   ├── [id]/            # Blog detail & edit pages
+│   │   ├── create/          # Create blog page
+│   │   └── page.tsx         # Blog list page
+│   ├── categories/          # Category pages
+│   │   ├── [id]/            # Category detail page
+│   │   └── page.tsx         # Category list page
+│   ├── layout.tsx           # Root layout with AuthProvider
+│   └── page.tsx             # Home page
+├── components/              # Reusable components
+│   └── Navbar.tsx           # Navigation bar
+├── contexts/                # React contexts
+│   └── AuthContext.tsx      # Authentication context
+├── lib/                     # Utilities
+│   └── api.ts               # Axios instance with interceptors
+├── services/                # API services
+│   └── blogService.ts       # Blog & category API calls
+└── types/                   # TypeScript types
+    └── index.ts             # Type definitions
+
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## API Integration
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The application integrates with a Laravel Sanctum backend. Ensure your Laravel API has the following endpoints:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Auth Routes
+- `POST /api/login` - User login
+- `POST /api/register` - User registration
+- `GET /api/profile` - Get authenticated user profile
+- `POST /api/logout` - User logout
 
-## Learn More
+### Blog Routes
+- `GET /api/blogs` - List all blogs (with pagination)
+- `GET /api/blogs/{id}` - Get single blog
+- `POST /api/blogs` - Create new blog (authenticated)
+- `PUT /api/blogs/{id}` - Update blog (authenticated)
+- `DELETE /api/blogs/{id}` - Delete blog (authenticated)
 
-To learn more about Next.js, take a look at the following resources:
+### Category Routes
+- `GET /api/categories` - List all categories
+- `GET /api/categories/{id}` - Get single category
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Authentication Flow
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. User logs in via `/auth/login`
+2. Backend returns a Bearer token
+3. Token is stored in `localStorage`
+4. Axios interceptor adds token to all subsequent requests
+5. On 401 response, user is redirected to login
 
-## Deploy on Vercel
+## Available Scripts
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+# Development
+npm run dev
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Build for production
+npm run build
+
+# Start production server
+npm start
+
+# Lint code
+npm run lint
+```
+
+## DaisyUI Themes
+
+The application uses DaisyUI with multiple theme support:
+- Light theme
+- Dark theme
+- Cupcake theme
+
+Themes automatically switch based on system preferences.
+
+## Key Features Implementation
+
+### Protected Routes
+Routes like blog creation and editing check for authentication and redirect to login if needed.
+
+### Form Validation
+All forms include client-side validation and display server-side error messages.
+
+### Loading States
+Loading spinners are shown during API calls for better UX.
+
+### Error Handling
+Comprehensive error handling with user-friendly error messages.
+
+### Responsive Design
+Fully responsive layout using DaisyUI and Tailwind CSS utilities.
+
+## Troubleshooting
+
+### CORS Issues
+Ensure your Laravel backend has CORS properly configured for your Next.js frontend URL.
+
+### Authentication Not Working
+1. Check that `NEXT_PUBLIC_API_URL` is correctly set in `.env.local`
+2. Verify Laravel Sanctum is properly configured
+3. Check browser console for error messages
+
+### API Connection Failed
+1. Ensure Laravel backend is running
+2. Verify the API URL in `.env.local`
+3. Check network tab in browser dev tools
+
+## Contributing
+
+Feel free to submit issues and enhancement requests!
+
+## License
+
+This project is open-source and available under the MIT License.
