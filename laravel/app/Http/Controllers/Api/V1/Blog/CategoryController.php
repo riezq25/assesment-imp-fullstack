@@ -22,6 +22,7 @@ class CategoryController extends ApiBaseController
             ->when($search, function ($query) use ($search) {
                 $query->where('name', 'like', "%{$search}%");
             })
+            ->withCount('blogs')
             ->orderBy('name', 'asc')
             ->paginate($perPage, ['*'], 'page', $page);
 

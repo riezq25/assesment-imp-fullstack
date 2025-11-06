@@ -18,10 +18,11 @@ class BlogController extends ApiBaseController
 
     public function index(Request $request)
     {
-        $perPage = $request->query('per_page', 10);
+        $perPage = $request->query('per_page', 9);
         $page = $request->query('page', 1);
         $search = $request->query('q', null);
         $isOwner = $request->query('is_owner', null);
+        $categoryId = $request->query('category_id', null);
 
         $blogs = Blog::query()
             ->when($search, function ($query) use ($search) {
@@ -30,6 +31,9 @@ class BlogController extends ApiBaseController
             })
             ->when($isOwner == true, function ($query) {
                 $query->where('created_by', auth()->id());
+            })
+            ->when($categoryId, function ($query) use ($categoryId) {
+                $query->where('category_id', $categoryId);
             })
             ->orderBy('created_at', 'desc')
             ->paginate($perPage, ['*'], 'page', $page);

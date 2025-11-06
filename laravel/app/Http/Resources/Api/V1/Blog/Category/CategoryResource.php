@@ -14,7 +14,7 @@ class CategoryResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $request->only(['id', 'name']);
+        $request->only(['id', 'name', 'blog_count']);
 
         return parent::toArray($request);
     }
