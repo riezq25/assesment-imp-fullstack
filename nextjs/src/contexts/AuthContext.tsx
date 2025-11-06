@@ -8,7 +8,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (credentials: LoginCredentials) => Promise<void>;
-  register: (credentials: RegisterCredentials) => Promise<void>;
+  register: (credentials: RegisterCredentials) => Promise<{ message: string }>;
   logout: () => Promise<void>;
   fetchProfile: () => Promise<void>;
 }
@@ -51,12 +51,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (credentials: LoginCredentials) => {
     try {
       const response = await api.post<AuthResponse>('/auth/login', credentials);
-      const { user, token, } = response.data;
-      console.log(response.data);
+      const { data } = response.data;
       if (typeof window !== 'undefined') {
-        localStorage.setItem('token', token);
+        localStorage.setItem('token', data.token);
       }
-      setUser(user);
+      setUser(data.user);
     } catch (error) {
       throw error;
     }
@@ -64,13 +63,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const register = async (credentials: RegisterCredentials) => {
     try {
-      const response = await api.post<AuthResponse>('/auth/register', credentials);
-      const { user, token } = response.data;
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('token', token);
-      }
-      setUser(user);
-    } catch (error) {
+      const response = await api.post<{ message: string }>('/auth/register', credentials);
+      // Return the success message
+      return { message: response.data.message };
+    } catch (error: any) {
+      console.error('Registration error:', error);
+      // Forward the error to be handled by the component
       throw error;
     }
   };

@@ -45,16 +45,18 @@ export default function CategoriesPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {categories.map((category) => (
-          <Link href={`/categories/${category.id}`} key={category.id}>
-            <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow cursor-pointer">
+          <Link href={`/blogs?category_id=${category.id}`} key={category.id}>
+            <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow cursor-pointer h-full">
               <div className="card-body">
-                <h2 className="card-title">{category.name}</h2>
-                {category.description && (
-                  <p className="text-base-content/70">{category.description}</p>
-                )}
-                <div className="card-actions justify-end">
-                  <div className="badge badge-primary">View Posts</div>
+                <div className="flex justify-between items-start">
+                  <h2 className="card-title">{category.name}</h2>
+                  {category.blogs_count !== undefined && (
+                    <div className="badge badge-primary p-4">
+                      {category.blogs_count} {category.blogs_count === 1 ? 'Post' : 'Posts'}
+                    </div>
+                  )}
                 </div>
+                {category.description && <p className="mt-2 text-gray-600">{category.description}</p>}
               </div>
             </div>
           </Link>

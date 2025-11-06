@@ -12,12 +12,18 @@ export default function RegisterPage() {
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const { register } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Prevent double submission
+    if (loading) return;
+    
     setError('');
+    setSuccess(false);
 
     if (password !== passwordConfirmation) {
       setError('Passwords do not match');
@@ -27,11 +33,49 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      await register({ name, email, password, password_confirmation: passwordConfirmation });
-      router.push('/');
-      router.refresh();
+      console.log('Attempting to register with:', { name, email });
+      
+      // Call register and get the success message
+      const result = await register({ 
+        name, 
+        email, 
+        password, 
+        password_confirmation: passwordConfirmation 
+      });
+      
+      console.log('Registration successful:', result.message);
+      
+      // Show success message
+      setSuccess(true);
+      setError('');
+      
+      // Show success message for 3 seconds before redirecting to login
+      setTimeout(() => {
+        router.push('/auth/login');
+      }, 3000);
+      
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+      console.error('Registration error:', {
+        error: err,
+        response: err.response?.data,
+        status: err.response?.status,
+        message: err.message
+      });
+      
+      // Handle validation errors
+      if (err.response?.data?.errors) {
+        const errorMessages = Object.values(err.response.data.errors)
+          .flat()
+          .join('\n');
+        setError(errorMessages);
+      } else {
+        // Handle other errors
+        const errorMessage = err.response?.data?.message || 
+                           err.response?.data?.error || 
+                           err.message || 
+                           'Registration failed. Please try again.';
+        setError(errorMessage);
+      }
     } finally {
       setLoading(false);
     }
@@ -102,7 +146,18 @@ export default function RegisterPage() {
             </div>
             {error && (
               <div className="alert alert-error">
+                <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
                 <span>{error}</span>
+              </div>
+            )}
+            {success && (
+              <div className="alert alert-success">
+                <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Registration successful! Redirecting to homepage...</span>
               </div>
             )}
             <div className="form-control mt-6">

@@ -1,32 +1,39 @@
 export interface User {
-  id: number;
+  id: string;
   name: string;
   email: string;
+  avatar?: string;
   created_at?: string;
   updated_at?: string;
 }
 
 export interface Category {
-  id: number;
+  id: string;
   name: string;
   slug: string;
   description?: string;
+  blogs_count?: number;
   created_at?: string;
   updated_at?: string;
 }
 
 export interface Blog {
-  id: number;
+  id: string;
   title: string;
   slug: string;
   content: string;
   excerpt?: string;
-  category_id: number;
+  featured_image?: string;
+  image?: string;
+  category_id: string;
   category?: Category;
-  user_id: number;
-  user?: User;
-  created_at?: string;
-  updated_at?: string;
+  created_by?: string;
+  updated_by?: string;
+  creator?: User;
+  editor?: User;
+  published_at?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface LoginCredentials {
@@ -42,8 +49,11 @@ export interface RegisterCredentials {
 }
 
 export interface AuthResponse {
-  user: User;
-  token: string;
+  message: string;
+  data: {
+    user: User;
+    token: string;
+  };
 }
 
 export interface ApiResponse<T> {
@@ -53,8 +63,10 @@ export interface ApiResponse<T> {
 
 export interface PaginatedResponse<T> {
   data: T[];
-  current_page: number;
-  last_page: number;
-  per_page: number;
-  total: number;
+  meta: {
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total_data: number;
+  };
 }

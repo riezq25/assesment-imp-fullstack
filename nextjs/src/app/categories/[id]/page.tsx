@@ -74,7 +74,7 @@ export default function CategoryDetailPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {blogs.map((blog) => (
-          <Link href={`/blogs/${blog.id}`} key={blog.id}>
+          <Link href={`/blogs/${blog.slug}`} key={blog.id}>
             <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow cursor-pointer h-full">
               <div className="card-body">
                 <h3 className="card-title">{blog.title}</h3>
@@ -83,7 +83,7 @@ export default function CategoryDetailPage() {
                 )}
                 <div className="card-actions justify-between items-center mt-4">
                   <div className="text-sm text-base-content/60">
-                    {blog.user?.name}
+                    {blog.creator?.name || 'Unknown'}
                   </div>
                   <div className="badge badge-outline">Read more</div>
                 </div>

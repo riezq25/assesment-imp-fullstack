@@ -1,22 +1,26 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { blogService } from '@/services/blogService';
-import { Category } from '@/types';
+import { Blog, Category } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
 
-export default function CreateBlogPage() {
+export default function EditBlogPage() {
+  const params = useParams();
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
+  const [blog, setBlog] = useState<Blog | null>(null);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [excerpt, setExcerpt] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
   const [featuredImage, setFeaturedImage] = useState<File | null>(null);
   const [previewImage, setPreviewImage] = useState<string>('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -26,15 +30,29 @@ export default function CreateBlogPage() {
   }, [user, authLoading, router]);
 
   useEffect(() => {
-    fetchCategories();
-  }, []);
+    if (params.slug) {
+      fetchBlogAndCategories();
+    }
+  }, [params.slug]);
 
-  const fetchCategories = async () => {
+  const fetchBlogAndCategories = async () => {
     try {
-      const response = await blogService.getCategories();
-      setCategories(response.data);
-    } catch (err) {
-      console.error('Failed to fetch categories:', err);
+      const [blogResponse, categoriesResponse] = await Promise.all([
+        blogService.getBlogBySlug(String(params.slug)),
+        blogService.getCategories(),
+      ]);
+
+      const blogData = blogResponse.data;
+      setBlog(blogData);
+      setTitle(blogData.title);
+      setContent(blogData.content);
+      setExcerpt(blogData.excerpt || '');
+      setCategoryId(String(blogData.category_id));
+      setCategories(categoriesResponse.data);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to fetch blog post');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -49,45 +67,27 @@ export default function CreateBlogPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setLoading(true);
-
-    if (!featuredImage) {
-      setError('Please select a featured image');
-      setLoading(false);
-      return;
-    }
+    setSaving(true);
 
     const formData = new FormData();
     formData.append('title', title);
     formData.append('content', content);
+    formData.append('excerpt', excerpt);
     formData.append('category_id', categoryId);
-    
-    // Append the file with the correct field name and file name
     if (featuredImage) {
-      formData.append('featured_image', featuredImage, featuredImage.name);
+      formData.append('featured_image', featuredImage);
     }
 
     try {
-      // Make sure to set the correct content type for FormData
-      const response = await blogService.createBlog(formData, true);
-      // Use the slug from the response for redirection
-      router.push(`/blogs/${response.data.slug}`);
+      await blogService.updateBlog(blog!.id, formData, true);
+      router.push(`/blogs/${blog!.slug}`);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Failed to create blog post';
-      const fieldErrors = err.response?.data?.errors;
-      
-      if (fieldErrors) {
-        // Handle field-specific errors
-        const errorMessages = Object.values(fieldErrors).flat().join('\n');
-        setError(errorMessages);
-      } else {
-        setError(errorMessage);
-      }
-      setLoading(false);
+      setError(err.response?.data?.message || 'Failed to update blog post');
+      setSaving(false);
     }
   };
 
-  if (authLoading) {
+  if (authLoading || loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <span className="loading loading-spinner loading-lg"></span>
@@ -95,14 +95,24 @@ export default function CreateBlogPage() {
     );
   }
 
-  if (!user) {
+  if (!user || !blog) {
     return null;
+  }
+
+  if (blog.created_by !== user?.id) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="alert alert-error">
+          <span>You are not authorized to edit this blog post</span>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8">Create New Blog Post</h1>
+        <h1 className="text-4xl font-bold mb-8">Edit Blog Post</h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
@@ -184,19 +194,44 @@ export default function CreateBlogPage() {
               </div>
               <p className="label">Optional</p>
               
-              {/* Image Preview */}
-              {previewImage && (
-                <div className="mt-2">
-                  <p className="text-sm text-gray-500 mb-1">Preview:</p>
-                  <img
-                    src={previewImage}
-                    alt="Preview"
-                    className="h-32 w-full object-cover rounded-lg border border-base-300"
-                  />
-                </div>
-              )}
+              {/* Image Previews */}
+              <div className="mt-2 space-y-2">
+                {(previewImage || blog.featured_image) && !featuredImage && (
+                  <div>
+                    <p className="text-sm text-gray-500 mb-1">Current Image:</p>
+                    <img
+                      src={previewImage || blog.featured_image}
+                      alt="Preview"
+                      className="h-32 w-full object-cover rounded-lg border border-base-300"
+                    />
+                  </div>
+                )}
+                {previewImage && (
+                  <div>
+                    <p className="text-sm text-gray-500 mb-1">New Image Preview:</p>
+                    <img
+                      src={previewImage}
+                      alt="Preview"
+                      className="h-32 w-full object-cover rounded-lg border border-base-300"
+                    />
+                  </div>
+                )}
+              </div>
             </fieldset>
           </div>
+
+          {/* Excerpt Field */}
+          <fieldset className="fieldset">
+            <legend className="fieldset-legend">Excerpt</legend>
+            <textarea
+              className="textarea w-full"
+              placeholder="Brief summary of your blog post"
+              rows={4}
+              value={excerpt}
+              onChange={(e) => setExcerpt(e.target.value)}
+            ></textarea>
+            <p className="label">A short summary of your blog post (Optional)</p>
+          </fieldset>
 
           {/* Content Field */}
           <fieldset className="fieldset">
@@ -212,29 +247,29 @@ export default function CreateBlogPage() {
             <p className="label">Required</p>
           </fieldset>
 
-          <div className="divider"></div>
-          <div className="flex justify-end space-x-2">
-            <button
-              type="button"
-              className="btn btn-ghost"
-              onClick={() => router.back()}
-              disabled={loading}
-            >
-              Cancel
-            </button>
-            <button 
-              type="submit" 
-              className="btn btn-primary" 
-              disabled={loading}
-            >
-              {loading ? (
-                <>
-                  <span className="loading loading-spinner"></span>
-                  Creating...
-                </>
-              ) : 'Create Post'}
-            </button>
-          </div>
+            <div className="divider"></div>
+            <div className="flex justify-end space-x-2">
+              <button
+                type="button"
+                className="btn btn-ghost"
+                onClick={() => router.back()}
+                disabled={saving}
+              >
+                Cancel
+              </button>
+              <button 
+                type="submit" 
+                className="btn btn-primary" 
+                disabled={saving}
+              >
+                {saving ? (
+                  <>
+                    <span className="loading loading-spinner"></span>
+                    Updating...
+                  </>
+                ) : 'Update Post'}
+              </button>
+            </div>
         </form>
       </div>
     </div>
