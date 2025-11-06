@@ -1,9 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  reactCompiler: true,
+  reactStrictMode: true,
+  swcMinify: true,
+  compiler: {
+    reactRemoveProperties: process.env.NODE_ENV === 'production',
+  },
   images: {
-    domains: ['localhost', '127.0.0.1'],
     remotePatterns: [
       {
         protocol: 'http',
@@ -32,20 +35,33 @@ const nextConfig: NextConfig = {
   
   // Enable experimental features
   experimental: {
-    serverActions: true,
-    serverComponentsExternalPackages: ['sharp', 'onnxruntime-node'],
-    urlImports: ['http://localhost:8000']
-  },
-  
-  // Increase the upload limit for API routes
-  api: {
-    bodyParser: {
-      sizeLimit: '4mb',
+    serverActions: {
+      bodySizeLimit: '4mb',
     },
+    serverComponentsExternalPackages: ['sharp', 'onnxruntime-node']
   },
   
-  // Webpack configuration
-  webpack: (config, { isServer }) => {
+  // Webpack configuration with better defaults
+  webpack: (config, { isServer, dev }) => {
+    // Add support for native modules if needed
+    config.experiments = {
+      ...config.experiments,
+      layers: true,
+    };
+
+    // Fixes npm packages that depend on `node:` protocol
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      fs: false,
+      net: false,
+      tls: false,
+    };
+
+    // Only run SWC minification in production
+    if (!dev && !isServer) {
+      config.optimization.minimizer = [];
+    }
+
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
